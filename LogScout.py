@@ -11,9 +11,32 @@ def extract_events(event_type, since, until):
     logs = result.stdout.splitlines()
 
     filtered = []
+    keywords = {
+    "AUTH_SUCCESS": ["Accepted password", "session opened"],
+    "AUTH_FAILURE": ["authentication failure", "Failed password"],
+    "SUDO": ["sudo", "COMMAND="],
+    "SSH_CONNECT": ["sshd", "Accepted", "session opened"],
+    "SSH_FAILED": ["sshd", "Failed password", "authentication failure"],
+    "USERADD": ["useradd"],
+    "USERDEL": ["userdel"],
+    "GROUPMOD": ["groupadd", "groupdel", "groupmod"],
+    "SU_ATTEMPT": ["su:"],
+    "CRON": ["CRON", "cron"],
+    "SERVICE": ["systemd", "Started", "Stopped", "Failed"],
+    "APT": ["apt", "apt-get", "install", "remove", "upgrade"] }
+
     for line in logs:
-        if event_type == "ALL" or event_type.lower() in line.lower():
-            filtered.append({"timestamp": line[:15], "message": line})
+    if matches_keywords(event_type, line):
+        filtered.append({"timestamp": line[:15], "message": line})
+
+
+def matches_keywords(event_type, line):
+    if event_type == "ALL":
+        return True
+    if event_type not in keywords:
+        return False
+    return any(word in line for word in keywords[event_type])
+
 
     return filtered
 
@@ -43,7 +66,10 @@ root.geometry("400x300")
 ttk.Label(root, text="Тип события:").pack(pady=5)
 event_var = tk.StringVar()
 event_menu = ttk.Combobox(root, textvariable=event_var)
-event_menu["values"] = ["ALL", "AUTH_SUCCESS", "AUTH_FAILURE", "SUDO"]
+event_menu["values"] = [
+    "ALL", "AUTH_SUCCESS", "AUTH_FAILURE", "SUDO", "SSH_CONNECT", "SSH_FAILED",
+    "USERADD", "USERDEL", "GROUPMOD", "SU_ATTEMPT", "CRON", "SERVICE", "APT"
+]
 event_menu.current(0)
 event_menu.pack()
 
