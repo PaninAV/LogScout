@@ -61,7 +61,8 @@ def export(events, fmt):
 # GUI
 root = tk.Tk()
 root.title("LogScout GUI")
-root.geometry("400x300")
+root.geometry("800x500")
+
 
 
 # Тип события
