@@ -5,13 +5,7 @@ import pandas as pd
 import subprocess
 
 # Функция для извлечения логов (упрощённо)
-def extract_events(event_type, since, until):
-    cmd = ["journalctl", "--since", since, "--until", until]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    logs = result.stdout.splitlines()
-
-    filtered = []
-    keywords = {
+keywords = {
     "AUTH_SUCCESS": ["Accepted password", "session opened"],
     "AUTH_FAILURE": ["authentication failure", "Failed password"],
     "SUDO": ["sudo", "COMMAND="],
@@ -23,13 +17,10 @@ def extract_events(event_type, since, until):
     "SU_ATTEMPT": ["su:"],
     "CRON": ["CRON", "cron"],
     "SERVICE": ["systemd", "Started", "Stopped", "Failed"],
-    "APT": ["apt", "apt-get", "install", "remove", "upgrade"] }
+    "APT": ["apt", "apt-get", "install", "remove", "upgrade"]
+}
 
-    for line in logs:
-    if matches_keywords(event_type, line):
-        filtered.append({"timestamp": line[:15], "message": line})
-
-
+# Проверка строки на соответствие категории
 def matches_keywords(event_type, line):
     if event_type == "ALL":
         return True
@@ -37,7 +28,16 @@ def matches_keywords(event_type, line):
         return False
     return any(word in line for word in keywords[event_type])
 
+# Извлечение событий
+def extract_events(event_type, since, until):
+    cmd = ["journalctl", "--since", since, "--until", until]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    logs = result.stdout.splitlines()
 
+    filtered = []
+    for line in logs:
+        if matches_keywords(event_type, line):
+            filtered.append({"timestamp": line[:15], "message": line})
     return filtered
 
 # Экспорт в файл
