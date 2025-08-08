@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import subprocess
 
-# Функция для извлечения логов (упрощённо)
+
 keywords = {
     "AUTH_SUCCESS": ["Accepted password", "session opened"],
     "AUTH_FAILURE": ["authentication failure", "Failed password"],
@@ -39,6 +39,7 @@ def extract_events(event_type, since, until):
         if matches_keywords(event_type, line):
             filtered.append({"timestamp": line[:15], "message": line})
     return filtered
+
 
 # Экспорт в файл
 def export(events, fmt):
