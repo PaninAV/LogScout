@@ -63,6 +63,7 @@ root = tk.Tk()
 root.title("LogScout GUI")
 root.geometry("400x300")
 
+
 # Тип события
 ttk.Label(root, text="Тип события:").pack(pady=5)
 event_var = tk.StringVar()
@@ -117,9 +118,17 @@ ttk.Button(root, text="Сохранить в Excel", command=lambda: export(even
 tree = ttk.Treeview(root, columns=("timestamp", "message"), show="headings", height=10)
 tree.heading("timestamp", text="Время")
 tree.heading("message", text="Сообщение")
-tree.column("timestamp", width=120)
-tree.column("message", width=250)
-tree.pack(pady=10)
+tree.column("timestamp", width=150, anchor="w")
+tree.column("message", width=600, anchor="w")
+
+scroll_y = ttk.Scrollbar(root, orient="vertical", command=tree.yview)
+scroll_x = ttk.Scrollbar(root, orient="horizontal", command=tree.xview)
+tree.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+
+tree.pack(side="top", fill="both", expand=True)
+scroll_y.pack(side="right", fill="y")
+scroll_x.pack(side="bottom", fill="x")
+
 
 root.mainloop()
 
