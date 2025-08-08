@@ -100,6 +100,12 @@ def on_extract():
         return
 
     events_data = extract_events(e_type, since, until)
+    # Очистить таблицу перед новым выводом
+    for i in tree.get_children():
+        tree.delete(i)
+    # Добавить новые данные
+    for event in events_data:
+        tree.insert("", "end", values=(event["timestamp"], event["message"]))
     messagebox.showinfo("Готово", f"Извлечено {len(events_data)} событий.")
 
 ttk.Button(root, text="Извлечь артефакты", command=on_extract).pack(pady=10)
@@ -107,6 +113,13 @@ ttk.Button(root, text="Извлечь артефакты", command=on_extract).p
 # Кнопки сохранения
 ttk.Button(root, text="Сохранить в CSV", command=lambda: export(events_data, "csv")).pack(pady=5)
 ttk.Button(root, text="Сохранить в Excel", command=lambda: export(events_data, "excel")).pack(pady=5)
+
+tree = ttk.Treeview(root, columns=("timestamp", "message"), show="headings", height=10)
+tree.heading("timestamp", text="Время")
+tree.heading("message", text="Сообщение")
+tree.column("timestamp", width=120)
+tree.column("message", width=250)
+tree.pack(pady=10)
 
 root.mainloop()
 
